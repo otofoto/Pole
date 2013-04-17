@@ -7,7 +7,10 @@
    Fix for more than 236 mbat block entries : Michel Boudinot
    Copyright 2010 <Michel.Boudinot@inaf.cnrs-gif.fr>
 
-   Version: 0.4
+   Considerable rework to allow for creation and updating of structured storage: Stephen Baum
+   Copyright 2013 <sbaum@gmail.com>
+
+   Version: 0.5
 
    Redistribution and use in source and binary forms, with or without 
    modification, are permitted provided that the following conditions 
@@ -70,7 +73,7 @@ public:
   /**
    * Opens the storage. Returns true if no error occurs.
    **/
-  bool open();
+  bool open(bool bWriteAccess = false, bool bCreate = false);
 
   /**
    * Closes the storage.
@@ -90,21 +93,34 @@ public:
   /**
    * Returns true if specified entry name is a directory.
    */
-  bool isDirectory( const std::string& name ); 
+  bool isDirectory( const std::string& name );
 
   /**
-   * Finds and returns a stream with the specified name.
-   * If reuse is true, this function returns the already created stream
-   * (if any). Otherwise it will create the stream.
-   *
-   * When errors occur, this function returns NULL.
-   *
-   * You do not need to delete the created stream, it will be handled
-   * automatically.
-   **/
-  Stream* stream( const std::string& name, bool reuse = true );
-  //Stream* stream( const std::string& name, int mode = Stream::ReadOnly, bool reuse = true );
-  
+   * Returns true if specified entry name exists.
+   */
+  bool exists( const std::string& name );
+
+  /**
+   * Returns true if storage can be modified.
+   */
+  bool isWriteable();
+
+  /**
+   * Deletes a specified stream or directory. If directory, it will
+   * recursively delete everything underneath said directory.
+   * returns true for success
+   */
+  bool deleteByName( const std::string& name );
+
+  /**
+   * Returns an accumulation of information, hopefully useful for determining if the storage
+   * should be defragmented.
+   */
+
+  void GetStats(unsigned int *pEntries, unsigned int *pUnusedEntries,
+	  unsigned int *pBigBlocks, unsigned int *pUnusedBigBlocks,
+	  unsigned int *pSmallBlocks, unsigned int *pUnusedSmallBlocks);
+
 private:
   StorageIO* io;
   
@@ -125,7 +141,7 @@ public:
    * Creates a new stream.
    */
   // name must be absolute, e.g "/Workbook"
-  Stream( Storage* storage, const std::string& name );
+  Stream( Storage* storage, const std::string& name, bool bCreate = false, long streamSize = 0);
 
   /**
    * Destroys the stream.
@@ -141,6 +157,13 @@ public:
    * Returns the stream size.
    **/
   unsigned long size();
+
+  /**
+   * Changes the stream size (note this is done automatically if you write beyond the old size.
+   * Use this primarily as a preamble to rewriting a stream that is already open. Of course, you
+   * could simply delete the stream first).
+   **/
+  void setSize(long newSize);
 
   /**
    * Returns the current read/write position.
@@ -160,7 +183,17 @@ public:
   /**
    * Reads a block of data.
    **/
-  unsigned long read( unsigned char* data, unsigned long maxlen );
+  unsigned int read( unsigned char* data, unsigned int maxlen );
+  
+  /**
+   * Writes a block of data.
+   **/
+  unsigned int write( unsigned char* data, unsigned int len );
+
+  /**
+   * Makes sure that any changes for the stream (and the structured storage) have been written to disk.
+   **/
+  void flush();
   
   /**
    * Returns true if the read/write position is past the file.

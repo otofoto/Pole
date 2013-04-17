@@ -1,3 +1,6 @@
+POLE 0.5 (released Mach 2013 by Stephen Baum)
+	* Considerable rework to allow for creation and updating of structured storage.
+
 POLE 0.4 (released March 2010 by Michel Boudinot)
         * Fix for more than 236 mbat block entries
         
