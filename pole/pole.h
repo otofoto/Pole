@@ -118,8 +118,8 @@ public:
    */
 
   void GetStats(unsigned int *pEntries, unsigned int *pUnusedEntries,
-	  unsigned int *pBigBlocks, unsigned int *pUnusedBigBlocks,
-	  unsigned int *pSmallBlocks, unsigned int *pUnusedSmallBlocks);
+      unsigned int *pBigBlocks, unsigned int *pUnusedBigBlocks,
+      unsigned int *pSmallBlocks, unsigned int *pUnusedSmallBlocks);
 
 private:
   StorageIO* io;

@@ -67,7 +67,7 @@ class Header
     unsigned int mbat_start;       // starting block to store meta bat
     unsigned int num_mbat;         // blocks allocated for meta bat
     unsigned int bb_blocks[109];
-	bool dirty;				   // Needs to be written
+    bool dirty;                // Needs to be written
     
     Header();
     bool valid();
@@ -87,7 +87,7 @@ class AllocTable
     AllocTable();
     void clear();
     unsigned int count();
-	unsigned int unusedCount();
+    unsigned int unusedCount();
     void resize( unsigned int newsize );
     void preserve( unsigned int n );
     void set( unsigned int index, unsigned int val );
@@ -99,13 +99,13 @@ class AllocTable
     void save( unsigned char* buffer );
     unsigned size();
     void debug();
-	bool isDirty();
-	void markAsDirty(unsigned int dataIndex, int bigBlockSize);
-	void flush(std::vector<unsigned int> blocks, StorageIO *const io, int bigBlockSize);
+    bool isDirty();
+    void markAsDirty(unsigned int dataIndex, int bigBlockSize);
+    void flush(std::vector<unsigned int> blocks, StorageIO *const io, int bigBlockSize);
   private:
     std::vector<unsigned int> data;
-	std::vector<unsigned int> dirtyBlocks;
-	bool bMaybeFragmented;
+    std::vector<unsigned int> dirtyBlocks;
+    bool bMaybeFragmented;
     AllocTable( const AllocTable& );
     AllocTable& operator=( const AllocTable& );
 };
@@ -121,8 +121,8 @@ class DirEntry
     unsigned prev;         // previous sibling
     unsigned next;         // next sibling
     unsigned child;        // first child
-	int compare(const DirEntry& de);
-	int compare(const std::string& name2);
+    int compare(const DirEntry& de);
+    int compare(const std::string& name2);
 
 };
 
@@ -133,9 +133,9 @@ class DirTree
     DirTree(int bigBlockSize);
     void clear(int bigBlockSize);
     inline unsigned int entryCount();
-	unsigned int unusedEntryCount();
+    unsigned int unusedEntryCount();
     DirEntry* entry( unsigned index );
-	DirEntry* entry( const std::string& name, bool create = false, int bigBlockSize = 0, StorageIO *const io = 0, int streamSize = 0);
+    DirEntry* entry( const std::string& name, bool create = false, int bigBlockSize = 0, StorageIO *const io = 0, int streamSize = 0);
     int indexOf( DirEntry* e );
     int parent( unsigned index );
     std::string fullName( unsigned index );
@@ -145,16 +145,16 @@ class DirTree
     void save( unsigned char* buffer );
     unsigned size();
     void debug();
-	bool isDirty();
-	void markAsDirty(unsigned int dataIndex, int bigBlockSize);
-	void flush(std::vector<unsigned int> blocks, StorageIO *const io, int bigBlockSize, unsigned int sb_start, unsigned int sb_size);
-	unsigned int unused();
-	void findParentAndSib(unsigned int inIdx, const std::string& inFullName, unsigned int &parentIdx, unsigned int &sibIdx);
-	unsigned findSib(unsigned int inIdx, unsigned int sibIdx);
-	void deleteEntry(DirEntry *entry, const std::string& inFullName, int bigBlockSize);
+    bool isDirty();
+    void markAsDirty(unsigned int dataIndex, int bigBlockSize);
+    void flush(std::vector<unsigned int> blocks, StorageIO *const io, int bigBlockSize, unsigned int sb_start, unsigned int sb_size);
+    unsigned int unused();
+    void findParentAndSib(unsigned int inIdx, const std::string& inFullName, unsigned int &parentIdx, unsigned int &sibIdx);
+    unsigned findSib(unsigned int inIdx, unsigned int sibIdx);
+    void deleteEntry(DirEntry *entry, const std::string& inFullName, int bigBlockSize);
   private:
     std::vector<DirEntry> entries;
-	std::vector<unsigned int> dirtyBlocks;
+    std::vector<unsigned int> dirtyBlocks;
     DirTree( const DirTree& );
     DirTree& operator=( const DirTree& );
 };
@@ -168,7 +168,7 @@ class StorageIO
     int result;               // result of operation
     bool opened;              // true if file is opened
     unsigned long filesize;   // size of the file
-	bool writeable;			  // true if the file can be modified
+    bool writeable;           // true if the file can be modified
     
     Header* header;           // storage header 
     DirTree* dirtree;         // directory tree
@@ -176,9 +176,9 @@ class StorageIO
     AllocTable* sbat;         // allocation table for small blocks
     
     std::vector<unsigned int> sb_blocks; // blocks for "small" files
-	std::vector<unsigned int> mbat_blocks; // blocks for doubly indirect indices to big blocks
-	std::vector<unsigned int> mbat_data; // the additional indices to big blocks
-	bool mbatDirty;			  // If true, mbat_blocks need to be written
+    std::vector<unsigned int> mbat_blocks; // blocks for doubly indirect indices to big blocks
+    std::vector<unsigned int> mbat_data; // the additional indices to big blocks
+    bool mbatDirty;           // If true, mbat_blocks need to be written
        
     std::list<Stream*> streams;
 
@@ -190,20 +190,20 @@ class StorageIO
     void flush();
     void load(bool bWriteAccess);
     void create();
-	void init();
+    void init();
     bool deleteByName(const std::string& fullName);
 
-	bool deleteNode(DirEntry *entry, const std::string& fullName);
+    bool deleteNode(DirEntry *entry, const std::string& fullName);
 
-	bool deleteLeaf(DirEntry *entry, const std::string& fullName);
+    bool deleteLeaf(DirEntry *entry, const std::string& fullName);
 
     unsigned int loadBigBlocks( std::vector<unsigned int> blocks, unsigned char* buffer, unsigned int maxlen );
 
     unsigned int loadBigBlock( unsigned int block, unsigned char* buffer, unsigned int maxlen );
 
-	unsigned int saveBigBlocks( std::vector<unsigned int> blocks, unsigned int offset, unsigned char* buffer, unsigned int len );
+    unsigned int saveBigBlocks( std::vector<unsigned int> blocks, unsigned int offset, unsigned char* buffer, unsigned int len );
 
-	unsigned int saveBigBlock( unsigned int block, unsigned int offset, unsigned char*buffer, unsigned int len );
+    unsigned int saveBigBlock( unsigned int block, unsigned int offset, unsigned char*buffer, unsigned int len );
 
     unsigned int loadSmallBlocks( std::vector<unsigned int> blocks, unsigned char* buffer, unsigned int maxlen );
 
@@ -215,15 +215,15 @@ class StorageIO
     
     StreamIO* streamIO( const std::string& name, bool bCreate = false, int streamSize = 0 ); 
 
-	void flushbbat();
+    void flushbbat();
 
-	void flushsbat();
+    void flushsbat();
 
-	std::vector<unsigned int> getbbatBlocks(bool bLoading);
+    std::vector<unsigned int> getbbatBlocks(bool bLoading);
 
-	unsigned int ExtendFile( std::vector<unsigned int> *chain );
+    unsigned int ExtendFile( std::vector<unsigned int> *chain );
 
-	void addbbatBlock();
+    void addbbatBlock();
 
   private:  
     // no copy or assign
@@ -244,15 +244,15 @@ class StreamIO
     StreamIO( StorageIO* io, DirEntry* entry );
     ~StreamIO();
     unsigned int size();
-	void setSize(unsigned int newSize);
+    void setSize(unsigned int newSize);
     void seek( unsigned int pos );
     unsigned int tell();
     int getch();
     unsigned int read( unsigned char* data, unsigned int maxlen );
     unsigned int read( unsigned int pos, unsigned char* data, unsigned int maxlen );
-	unsigned int write( unsigned char* data, unsigned int len );
-	unsigned int write( unsigned int pos, unsigned char* data, unsigned int len );
-	void flush();
+    unsigned int write( unsigned char* data, unsigned int len );
+    unsigned int write( unsigned int pos, unsigned char* data, unsigned int len );
+    void flush();
 
   private:
     std::vector<unsigned int> blocks;
@@ -278,17 +278,17 @@ using namespace POLE;
 
 static void fileCheck(std::fstream &file)
 {
-	bool bGood, bFail, bEof, bBad;
-	bool bNOTOK;
-	bGood = file.good();
-	bFail = file.fail();
-	bEof = file.eof();
-	bBad = file.bad();
-	if (bFail || bEof || bBad)
-		bNOTOK = true; //this doesn't really do anything, but it is a good place to set a breakpoint!
-	file.clear();
+    bool bGood, bFail, bEof, bBad;
+    bool bNOTOK;
+    bGood = file.good();
+    bFail = file.fail();
+    bEof = file.eof();
+    bBad = file.bad();
+    if (bFail || bEof || bBad)
+        bNOTOK = true; //this doesn't really do anything, but it is a good place to set a breakpoint!
+    file.clear();
 }
-	
+    
 
 static inline unsigned int readU16( const unsigned char* ptr )
 {
@@ -437,14 +437,14 @@ unsigned int AllocTable::count()
 
 unsigned int AllocTable::unusedCount()
 {
-	unsigned int maxIdx = count();
-	unsigned int nFound = 0;
-	for (unsigned int idx = 0; idx < maxIdx; idx++)
-	{
-		if( data[idx] == Avail )
-			nFound++;
-	}
-	return nFound;
+    unsigned int maxIdx = count();
+    unsigned int nFound = 0;
+    for (unsigned int idx = 0; idx < maxIdx; idx++)
+    {
+        if( data[idx] == Avail )
+            nFound++;
+    }
+    return nFound;
 }
 
 void AllocTable::resize( unsigned int newsize )
@@ -476,7 +476,7 @@ void AllocTable::set( unsigned int index, unsigned int value )
   if( index >= count() ) resize( index + 1);
   data[ index ] = value;
   if (value == Avail)
-	  bMaybeFragmented = true;
+      bMaybeFragmented = true;
 }
 
 void AllocTable::setChain( std::vector<unsigned int> chain )
@@ -517,9 +517,9 @@ unsigned AllocTable::unused()
   unsigned int maxIdx = (unsigned int) data.size();
   if (bMaybeFragmented)
   {
-	  for( unsigned i = 0; i < maxIdx; i++ )
-		if( data[i] == Avail )
-		  return i;
+      for( unsigned i = 0; i < maxIdx; i++ )
+        if( data[i] == Avail )
+          return i;
   }
   
   // completely full, so enlarge the table
@@ -550,40 +550,40 @@ void AllocTable::save( unsigned char* buffer )
 
 bool AllocTable::isDirty()
 {
-	return (dirtyBlocks.size() > 0);
+    return (dirtyBlocks.size() > 0);
 }
 
 void AllocTable::markAsDirty(unsigned int dataIndex, int bigBlockSize)
 {
-	unsigned int dbidx = dataIndex / (bigBlockSize / sizeof(unsigned int));
-	for (unsigned int idx = 0; idx < dirtyBlocks.size(); idx++)
-	{
-		if (dirtyBlocks[idx] == dbidx)
-			return;
-	}
-	dirtyBlocks.push_back(dbidx);
+    unsigned int dbidx = dataIndex / (bigBlockSize / sizeof(unsigned int));
+    for (unsigned int idx = 0; idx < dirtyBlocks.size(); idx++)
+    {
+        if (dirtyBlocks[idx] == dbidx)
+            return;
+    }
+    dirtyBlocks.push_back(dbidx);
 }
 
 void AllocTable::flush(std::vector<unsigned int> blocks, StorageIO *const io, int bigBlockSize)
 {
-	unsigned char *buffer = new unsigned char[bigBlockSize * blocks.size()];
-	save(buffer);
-	for (unsigned int idx = 0; idx < blocks.size(); idx++)
-	{
-		bool bDirty = false;
-		for (unsigned int idx2 = 0; idx2 < dirtyBlocks.size(); idx2++)
-		{
-			if (dirtyBlocks[idx2] == idx)
-			{
-				bDirty = true;
-				break;
-			}
-		}
-		if (bDirty)
-			io->saveBigBlock(blocks[idx], 0, &buffer[bigBlockSize*idx], bigBlockSize);
-	}
-	dirtyBlocks.clear();
-	delete[] buffer;
+    unsigned char *buffer = new unsigned char[bigBlockSize * blocks.size()];
+    save(buffer);
+    for (unsigned int idx = 0; idx < blocks.size(); idx++)
+    {
+        bool bDirty = false;
+        for (unsigned int idx2 = 0; idx2 < dirtyBlocks.size(); idx2++)
+        {
+            if (dirtyBlocks[idx2] == idx)
+            {
+                bDirty = true;
+                break;
+            }
+        }
+        if (bDirty)
+            io->saveBigBlock(blocks[idx], 0, &buffer[bigBlockSize*idx], bigBlockSize);
+    }
+    dirtyBlocks.clear();
+    delete[] buffer;
 }
 
 void AllocTable::debug()
@@ -607,17 +607,17 @@ void AllocTable::debug()
 // --Windows Compound Binary File Format Specification, Section 2.5
 int DirEntry::compare(const DirEntry& de)
 {
-	return compare(de.name);
+    return compare(de.name);
 }
 
 int DirEntry::compare(const std::string& name2)
 {
-	if (name.length() < name2.length())
-		return -1;
-	else if (name.length() > name2.length())
-		return 1;
-	else
-		return name.compare(name2);
+    if (name.length() < name2.length())
+        return -1;
+    else if (name.length() > name2.length())
+        return 1;
+    else
+        return name.compare(name2);
 }
 
 
@@ -652,13 +652,13 @@ inline unsigned int DirTree::entryCount()
 
 unsigned int DirTree::unusedEntryCount()
 {
-	unsigned int nFound = 0;
-	for (unsigned idx = 0; idx < entryCount(); idx++)
-	{
-		if (!entries[idx].valid)
-			nFound++;
-	}
-	return nFound;
+    unsigned int nFound = 0;
+    for (unsigned idx = 0; idx < entryCount(); idx++)
+    {
+        if (!entries[idx].valid)
+            nFound++;
+    }
+    return nFound;
 }
 
 DirEntry* DirTree::entry( unsigned index )
@@ -735,7 +735,7 @@ DirEntry* DirTree::entry( const std::string& name, bool create, int bigBlockSize
      end = name.find_first_of( '/', start );
      if( end == std::string::npos ) end = name.length();
      names.push_back( name.substr( start, end-start ) );
-	 levelsLeft++;
+     levelsLeft++;
      start = end+1;
    }
   
@@ -767,7 +767,7 @@ DirEntry* DirTree::entry( const std::string& name, bool create, int bigBlockSize
      }
      */
      // dima: performance optimisation of the previous
-	 unsigned closest = End;
+     unsigned closest = End;
      child = find_child( index, *it, closest );
      
      // traverse to the child
@@ -779,59 +779,59 @@ DirEntry* DirTree::entry( const std::string& name, bool create, int bigBlockSize
        
        // create a new entry
        unsigned parent = index;
-	   index = unused();
+       index = unused();
        DirEntry* e = entry( index );
        e->valid = true;
        e->name = *it;
        e->dir = (levelsLeft > 0);
-	   if (!e->dir)
-		   e->size = streamSize;
-	   else
-		   e->size = 0;
-	   e->start = AllocTable::Eof;
-	   e->child = End;
-	   if (closest == End)
-	   {
-		   e->prev = End;
-		   e->next = entry(parent)->child;
-		   entry(parent)->child = index;
-		   markAsDirty(parent, bigBlockSize);
-	   }
-	   else
-	   {
-		   DirEntry* closeE = entry( closest );
-		   if (closeE->compare(*e) < 0)
-		   {
-			   e->prev = closeE->next;
-			   e->next = End;
-			   closeE->next = index;
-		   }
-		   else
-		   {
-			   e->next = closeE->prev;
-			   e->prev = End;
-			   closeE->prev = index;
-		   }
-		   markAsDirty(closest, bigBlockSize);
-	   }
-	   markAsDirty(index, bigBlockSize);
-	   unsigned int bbidx = index / (bigBlockSize / 128);
-	   std::vector <unsigned int> blocks = io->bbat->follow(io->header->dirent_start);
-	   while (blocks.size() <= bbidx)
-	   {
-		   unsigned int nblock = io->bbat->unused();
-		   if (blocks.size() > 0)
-		   {
-			   io->bbat->set(blocks[(unsigned int)blocks.size()-1], nblock);
-			   io->bbat->markAsDirty(blocks[blocks.size()-1], bigBlockSize);
-		   }
-		   io->bbat->set(nblock, AllocTable::Eof);
-		   io->bbat->markAsDirty(nblock, bigBlockSize);
-		   blocks.push_back(nblock);
-		   unsigned int bbidx = nblock / (io->bbat->blockSize / sizeof(unsigned int));
-		   while (bbidx >= io->header->num_bat)
-			   io->addbbatBlock();
-	   }
+       if (!e->dir)
+           e->size = streamSize;
+       else
+           e->size = 0;
+       e->start = AllocTable::Eof;
+       e->child = End;
+       if (closest == End)
+       {
+           e->prev = End;
+           e->next = entry(parent)->child;
+           entry(parent)->child = index;
+           markAsDirty(parent, bigBlockSize);
+       }
+       else
+       {
+           DirEntry* closeE = entry( closest );
+           if (closeE->compare(*e) < 0)
+           {
+               e->prev = closeE->next;
+               e->next = End;
+               closeE->next = index;
+           }
+           else
+           {
+               e->next = closeE->prev;
+               e->prev = End;
+               closeE->prev = index;
+           }
+           markAsDirty(closest, bigBlockSize);
+       }
+       markAsDirty(index, bigBlockSize);
+       unsigned int bbidx = index / (bigBlockSize / 128);
+       std::vector <unsigned int> blocks = io->bbat->follow(io->header->dirent_start);
+       while (blocks.size() <= bbidx)
+       {
+           unsigned int nblock = io->bbat->unused();
+           if (blocks.size() > 0)
+           {
+               io->bbat->set(blocks[(unsigned int)blocks.size()-1], nblock);
+               io->bbat->markAsDirty(blocks[blocks.size()-1], bigBlockSize);
+           }
+           io->bbat->set(nblock, AllocTable::Eof);
+           io->bbat->markAsDirty(nblock, bigBlockSize);
+           blocks.push_back(nblock);
+           unsigned int bbidx = nblock / (io->bbat->blockSize / sizeof(unsigned int));
+           while (bbidx >= io->header->num_bat)
+               io->addbbatBlock();
+       }
      }
    }
 
@@ -842,12 +842,12 @@ DirEntry* DirTree::entry( const std::string& name, bool create, int bigBlockSize
 void dirtree_find_siblings( DirTree* dirtree, std::vector<unsigned>& result, 
   unsigned index )
 {
-	DirEntry* e = dirtree->entry( index );
-	if (e->prev != DirTree::End)
-		dirtree_find_siblings(dirtree, result, e->prev);
-	result.push_back(index);
-	if (e->next != DirTree::End)
-		dirtree_find_siblings(dirtree, result, e->next);
+    DirEntry* e = dirtree->entry( index );
+    if (e->prev != DirTree::End)
+        dirtree_find_siblings(dirtree, result, e->prev);
+    result.push_back(index);
+    if (e->next != DirTree::End)
+        dirtree_find_siblings(dirtree, result, e->next);
 }
 
 std::vector<unsigned> DirTree::children( unsigned index )
@@ -863,24 +863,24 @@ std::vector<unsigned> DirTree::children( unsigned index )
 
 unsigned dirtree_find_sibling( DirTree* dirtree, unsigned index, const std::string& name, unsigned &closest ) {
 
-	unsigned count = dirtree->entryCount();
-	DirEntry* e = dirtree->entry( index );
-	if (!e || !e->valid) return 0;
-	int cval = e->compare(name);
-	if (cval == 0)
-		return index;
-	if (cval > 0)
-	{
-		if (e->prev > 0 && e->prev < count)
-			return dirtree_find_sibling( dirtree, e->prev, name, closest );
-	}
-	else
-	{
-		if (e->next > 0 && e->next < count)
-			return dirtree_find_sibling( dirtree, e->next, name, closest );
-	}
-	closest = index;
-	return 0;
+    unsigned count = dirtree->entryCount();
+    DirEntry* e = dirtree->entry( index );
+    if (!e || !e->valid) return 0;
+    int cval = e->compare(name);
+    if (cval == 0)
+        return index;
+    if (cval > 0)
+    {
+        if (e->prev > 0 && e->prev < count)
+            return dirtree_find_sibling( dirtree, e->prev, name, closest );
+    }
+    else
+    {
+        if (e->next > 0 && e->next < count)
+            return dirtree_find_sibling( dirtree, e->next, name, closest );
+    }
+    closest = index;
+    return 0;
 }
 
 unsigned DirTree::find_child( unsigned index, const std::string& name, unsigned& closest ) {
@@ -988,69 +988,69 @@ void DirTree::save( unsigned char* buffer )
     writeU32( buffer + i*128 + 0x44, e->prev );
     writeU32( buffer + i*128 + 0x48, e->next );
     writeU32( buffer + i*128 + 0x4c, e->child );
-	if (!e->valid)
-		buffer[ i*128 + 0x42 ] = 0; //STGTY_INVALID
-	else
-		buffer[ i*128 + 0x42 ] = e->dir ? 1 : 2; //STGTY_STREAM or STGTY_STORAGE
+    if (!e->valid)
+        buffer[ i*128 + 0x42 ] = 0; //STGTY_INVALID
+    else
+        buffer[ i*128 + 0x42 ] = e->dir ? 1 : 2; //STGTY_STREAM or STGTY_STORAGE
     buffer[ i*128 + 0x43 ] = 1; // always black
   }  
 }
 
 bool DirTree::isDirty()
 {
-	return (dirtyBlocks.size() > 0);
+    return (dirtyBlocks.size() > 0);
 }
 
 
 void DirTree::markAsDirty(unsigned int dataIndex, int bigBlockSize)
 {
-	unsigned int dbidx = dataIndex / (bigBlockSize / 128);
-	for (unsigned int idx = 0; idx < dirtyBlocks.size(); idx++)
-	{
-		if (dirtyBlocks[idx] == dbidx)
-			return;
-	}
-	dirtyBlocks.push_back(dbidx);
+    unsigned int dbidx = dataIndex / (bigBlockSize / 128);
+    for (unsigned int idx = 0; idx < dirtyBlocks.size(); idx++)
+    {
+        if (dirtyBlocks[idx] == dbidx)
+            return;
+    }
+    dirtyBlocks.push_back(dbidx);
 }
 
 void DirTree::flush(std::vector<unsigned int> blocks, StorageIO *const io, int bigBlockSize, unsigned int sb_start, unsigned int sb_size)
 {
-	unsigned int bufLen = size();
-	unsigned char *buffer = new unsigned char[bufLen];
-	save(buffer);
-	writeU32( buffer + 0x74, sb_start );
-	writeU32( buffer + 0x78, sb_size );
-	for (unsigned int idx = 0; idx < blocks.size(); idx++)
-	{
-		bool bDirty = false;
-		for (unsigned int idx2 = 0; idx2 < dirtyBlocks.size(); idx2++)
-		{
-			if (dirtyBlocks[idx2] == idx)
-			{
-				bDirty = true;
-				break;
-			}
-		}
-		unsigned int bytesToWrite = bigBlockSize;
-		unsigned int pos = bigBlockSize*idx;
-		if ((bufLen - pos) < bytesToWrite)
-			bytesToWrite = bufLen - pos;
-		if (bDirty)
-			io->saveBigBlock(blocks[idx], 0, &buffer[pos], bytesToWrite);
-	}
-	dirtyBlocks.clear();
-	delete[] buffer;
+    unsigned int bufLen = size();
+    unsigned char *buffer = new unsigned char[bufLen];
+    save(buffer);
+    writeU32( buffer + 0x74, sb_start );
+    writeU32( buffer + 0x78, sb_size );
+    for (unsigned int idx = 0; idx < blocks.size(); idx++)
+    {
+        bool bDirty = false;
+        for (unsigned int idx2 = 0; idx2 < dirtyBlocks.size(); idx2++)
+        {
+            if (dirtyBlocks[idx2] == idx)
+            {
+                bDirty = true;
+                break;
+            }
+        }
+        unsigned int bytesToWrite = bigBlockSize;
+        unsigned int pos = bigBlockSize*idx;
+        if ((bufLen - pos) < bytesToWrite)
+            bytesToWrite = bufLen - pos;
+        if (bDirty)
+            io->saveBigBlock(blocks[idx], 0, &buffer[pos], bytesToWrite);
+    }
+    dirtyBlocks.clear();
+    delete[] buffer;
 }
 
 unsigned DirTree::unused()
 {
-	for (unsigned idx = 0; idx < entryCount(); idx++)
-	{
-		if (!entries[idx].valid)
-			return idx;
-	}
-	entries.push_back(DirEntry());
-	return entryCount()-1;
+    for (unsigned idx = 0; idx < entryCount(); idx++)
+    {
+        if (!entries[idx].valid)
+            return idx;
+    }
+    entries.push_back(DirEntry());
+    return entryCount()-1;
 }
 
 // Utility function to get the index of the parent dirEntry, given that we already have a full name it is relatively fast.
@@ -1059,28 +1059,28 @@ unsigned DirTree::unused()
 
 void DirTree::findParentAndSib(unsigned inIdx, const std::string& inFullName, unsigned &parentIdx, unsigned &sibIdx)
 {
-	sibIdx = 0;
-	parentIdx = 0;
-	if (inIdx == 0 || inIdx >= entryCount() || inFullName == "/" || inFullName == "")
-		return;
-	std::string localName = inFullName;
-	if (localName[0] != '/')
-		localName = '/' + localName;
-	std::string parentName = localName;
-	if (parentName[parentName.size()-1] == '/')
-		parentName = parentName.substr(0, parentName.size()-1);
-	std::string::size_type lastSlash;
-	lastSlash = parentName.find_last_of('/');
-	if (lastSlash == std::string::npos)
-		return;
-	if (lastSlash == 0)
-		lastSlash = 1; //leave root
-	parentName = parentName.substr(0, lastSlash);
-	DirEntry *parent = entry(parentName);
-	parentIdx = indexOf(parent);
-	if (parent->child == inIdx)
-		return; //successful return, no sibling points to inIdx
-	sibIdx = findSib(inIdx, parent->child);
+    sibIdx = 0;
+    parentIdx = 0;
+    if (inIdx == 0 || inIdx >= entryCount() || inFullName == "/" || inFullName == "")
+        return;
+    std::string localName = inFullName;
+    if (localName[0] != '/')
+        localName = '/' + localName;
+    std::string parentName = localName;
+    if (parentName[parentName.size()-1] == '/')
+        parentName = parentName.substr(0, parentName.size()-1);
+    std::string::size_type lastSlash;
+    lastSlash = parentName.find_last_of('/');
+    if (lastSlash == std::string::npos)
+        return;
+    if (lastSlash == 0)
+        lastSlash = 1; //leave root
+    parentName = parentName.substr(0, lastSlash);
+    DirEntry *parent = entry(parentName);
+    parentIdx = indexOf(parent);
+    if (parent->child == inIdx)
+        return; //successful return, no sibling points to inIdx
+    sibIdx = findSib(inIdx, parent->child);
 }
 
 // Utility function to get the index of the sibling dirEntry which points to inIdx. It is the responsibility of the original caller
@@ -1088,78 +1088,78 @@ void DirTree::findParentAndSib(unsigned inIdx, const std::string& inFullName, un
 
 unsigned DirTree::findSib(unsigned inIdx, unsigned sibIdx)
 {
-	DirEntry *sib = entry(sibIdx);
-	if (!sib || !sib->valid)
-		return 0;
-	if (sib->next == inIdx || sib->prev == inIdx)
-		return sibIdx;
-	DirEntry *targetSib = entry(inIdx);
-	int cval = sib->compare(*targetSib);
-	if (cval > 0)
-		return findSib(inIdx, sib->prev);
-	else
-		return findSib(inIdx, sib->next);
+    DirEntry *sib = entry(sibIdx);
+    if (!sib || !sib->valid)
+        return 0;
+    if (sib->next == inIdx || sib->prev == inIdx)
+        return sibIdx;
+    DirEntry *targetSib = entry(inIdx);
+    int cval = sib->compare(*targetSib);
+    if (cval > 0)
+        return findSib(inIdx, sib->prev);
+    else
+        return findSib(inIdx, sib->next);
 }
 
 void DirTree::deleteEntry(DirEntry *dirToDel, const std::string& inFullName, int bigBlockSize)
 {
-	unsigned parentIdx;
-	unsigned sibIdx;
-	unsigned inIdx = indexOf(dirToDel);
-	unsigned nEntries = entryCount();
-	findParentAndSib(inIdx, inFullName, parentIdx, sibIdx);
-	unsigned replIdx;
-	if (!dirToDel->next || dirToDel->next > nEntries)
-		replIdx = dirToDel->prev;
-	else
-	{
-		DirEntry *sibNext = entry(dirToDel->next);
-		if (!sibNext->prev || sibNext->prev > nEntries)
-		{
-			replIdx = dirToDel->next;
-			sibNext->prev = dirToDel->prev;
-			markAsDirty(replIdx, bigBlockSize);
-		}
-		else
-		{
-			DirEntry *smlSib = sibNext;
-			int smlIdx = dirToDel->next;
-			DirEntry *smlrSib;
-			int smlrIdx = -1;
-			for ( ; ; )
-			{
-				smlrIdx = smlSib->prev;
-				smlrSib = entry(smlrIdx);
-				if (!smlrSib->prev || smlrSib->prev > nEntries)
-					break;
-				smlSib = smlrSib;
-				smlIdx = smlrIdx;
-			}
-			replIdx = smlSib->prev;
-			smlSib->prev = smlrSib->next;
-			smlrSib->prev = dirToDel->prev;
-			smlrSib->next = dirToDel->next;
-			markAsDirty(smlIdx, bigBlockSize);
-			markAsDirty(smlrIdx, bigBlockSize);
-		}
-	}
-	if (sibIdx)
-	{
-		DirEntry *sib = entry(sibIdx);
-		if (sib->next == inIdx)
-			sib->next = replIdx;
-		else
-			sib->prev = replIdx;
-		markAsDirty(sibIdx, bigBlockSize);
-	}
-	else
-	{
-		DirEntry *parNode = entry(parentIdx);
-		parNode->child = replIdx;
-		markAsDirty(parentIdx, bigBlockSize);
-	}
-	dirToDel->valid = false; //indicating that this entry is not in use
-	markAsDirty(inIdx, bigBlockSize);
+    unsigned parentIdx;
+    unsigned sibIdx;
+    unsigned inIdx = indexOf(dirToDel);
+    unsigned nEntries = entryCount();
+    findParentAndSib(inIdx, inFullName, parentIdx, sibIdx);
+    unsigned replIdx;
+    if (!dirToDel->next || dirToDel->next > nEntries)
+        replIdx = dirToDel->prev;
+    else
+    {
+        DirEntry *sibNext = entry(dirToDel->next);
+        if (!sibNext->prev || sibNext->prev > nEntries)
+        {
+            replIdx = dirToDel->next;
+            sibNext->prev = dirToDel->prev;
+            markAsDirty(replIdx, bigBlockSize);
+        }
+        else
+        {
+            DirEntry *smlSib = sibNext;
+            int smlIdx = dirToDel->next;
+            DirEntry *smlrSib;
+            int smlrIdx = -1;
+            for ( ; ; )
+            {
+                smlrIdx = smlSib->prev;
+                smlrSib = entry(smlrIdx);
+                if (!smlrSib->prev || smlrSib->prev > nEntries)
+                    break;
+                smlSib = smlrSib;
+                smlIdx = smlrIdx;
+            }
+            replIdx = smlSib->prev;
+            smlSib->prev = smlrSib->next;
+            smlrSib->prev = dirToDel->prev;
+            smlrSib->next = dirToDel->next;
+            markAsDirty(smlIdx, bigBlockSize);
+            markAsDirty(smlrIdx, bigBlockSize);
+        }
+    }
+    if (sibIdx)
+    {
+        DirEntry *sib = entry(sibIdx);
+        if (sib->next == inIdx)
+            sib->next = replIdx;
+        else
+            sib->prev = replIdx;
+        markAsDirty(sibIdx, bigBlockSize);
+    }
+    else
+    {
+        DirEntry *parNode = entry(parentIdx);
+        parNode->child = replIdx;
+        markAsDirty(parentIdx, bigBlockSize);
+    }
+    dirToDel->valid = false; //indicating that this entry is not in use
+    markAsDirty(inIdx, bigBlockSize);
 }
 
 
@@ -1220,17 +1220,17 @@ bool StorageIO::open(bool bWriteAccess, bool bCreate)
 {
   // already opened ? close first
   if (opened)
-	  close();
+      close();
   if (bCreate)
   {
-	  create();
-	  init();
-	  writeable = true;
+      create();
+      init();
+      writeable = true;
   }
   else
   {
-	  writeable = bWriteAccess;
-	  load(bWriteAccess);
+      writeable = bWriteAccess;
+      load(bWriteAccess);
   }
   
   return result == Storage::Ok;
@@ -1245,9 +1245,9 @@ void StorageIO::load(bool bWriteAccess)
   // open the file, check for error
   result = Storage::OpenFailed;
   if (bWriteAccess)
-	  file.open( filename.c_str(), std::ios::binary | std::ios::in | std::ios::out );
+      file.open( filename.c_str(), std::ios::binary | std::ios::in | std::ios::out );
   else
-	  file.open( filename.c_str(), std::ios::binary | std::ios::in );
+      file.open( filename.c_str(), std::ios::binary | std::ios::in );
   if( !file.good() ) return;
   
   // find size of input file
@@ -1346,79 +1346,79 @@ void StorageIO::create()
 
 void StorageIO::init()
 {
-	// Initialize parts of the header, directory entries, and big and small allocation tables
-	header->bb_blocks[0] = 0;
-	header->dirent_start = 1;
-	header->sbat_start = 2;
-	header->num_bat = 1;
-	header->num_sbat = 1;
-	header->dirty = true;
-	bbat->set(0, AllocTable::Eof);
-	bbat->markAsDirty(0, bbat->blockSize);
-	bbat->set(1, AllocTable::Eof);
-	bbat->markAsDirty(1, bbat->blockSize);
-	bbat->set(2, AllocTable::Eof);
-	bbat->markAsDirty(2, bbat->blockSize);
-	bbat->set(3, AllocTable::Eof);
-	bbat->markAsDirty(3, bbat->blockSize);
-	sb_blocks = bbat->follow( 3 );
-	mbatDirty = false;	
+    // Initialize parts of the header, directory entries, and big and small allocation tables
+    header->bb_blocks[0] = 0;
+    header->dirent_start = 1;
+    header->sbat_start = 2;
+    header->num_bat = 1;
+    header->num_sbat = 1;
+    header->dirty = true;
+    bbat->set(0, AllocTable::Eof);
+    bbat->markAsDirty(0, bbat->blockSize);
+    bbat->set(1, AllocTable::Eof);
+    bbat->markAsDirty(1, bbat->blockSize);
+    bbat->set(2, AllocTable::Eof);
+    bbat->markAsDirty(2, bbat->blockSize);
+    bbat->set(3, AllocTable::Eof);
+    bbat->markAsDirty(3, bbat->blockSize);
+    sb_blocks = bbat->follow( 3 );
+    mbatDirty = false;  
 }
 
 void StorageIO::flush()
 {
-	if (header->dirty)
-	{
-		unsigned char *buffer = new unsigned char[512];
-		header->save( buffer );
-		file.seekp( 0 ); 
-		file.write( (char*)buffer, 512 );
-		fileCheck(file);
-		delete[] buffer;
-	}
-	if (bbat->isDirty())
-		flushbbat();
-	if (sbat->isDirty())
-		flushsbat();
-	if (dirtree->isDirty())
-	{
-		std::vector<unsigned int> blocks;
-		blocks = bbat->follow(header->dirent_start);
-		unsigned int sb_start = 0xffffffff;
-		if (sb_blocks.size() > 0)
-			sb_start = sb_blocks[0];
-		dirtree->flush(blocks, this, bbat->blockSize, sb_start, (unsigned int) sb_blocks.size()*bbat->blockSize);
-	}
-	if (mbatDirty && mbat_blocks.size() > 0)
-	{
-		unsigned int nBytes = bbat->blockSize * (unsigned int) mbat_blocks.size();
-		unsigned char *buffer = new unsigned char[nBytes];
-		unsigned int sIdx = 0;
-		unsigned int dcount = 0;
-		unsigned blockCapacity = bbat->blockSize / sizeof(unsigned int) - 1;
-		unsigned blockIdx = 0;
-		for (unsigned mdIdx = 0; mdIdx < mbat_data.size(); mdIdx++)
-		{
-			writeU32(buffer + sIdx, mbat_data[mdIdx]);
-			sIdx += 4;
-			dcount++;
-			if (dcount == blockCapacity)
-			{
-				blockIdx++;
-				if (blockIdx == mbat_blocks.size())
-					writeU32(buffer + sIdx, AllocTable::Eof);
-				else
-					writeU32(buffer + sIdx, mbat_blocks[blockIdx]);
-				sIdx += 4;
-				dcount = 0;
-			}
-		}
-		saveBigBlocks(mbat_blocks, 0, buffer, nBytes);
-		delete[] buffer;
-		mbatDirty = false;
-	}
-	file.flush();
-	fileCheck(file);
+    if (header->dirty)
+    {
+        unsigned char *buffer = new unsigned char[512];
+        header->save( buffer );
+        file.seekp( 0 ); 
+        file.write( (char*)buffer, 512 );
+        fileCheck(file);
+        delete[] buffer;
+    }
+    if (bbat->isDirty())
+        flushbbat();
+    if (sbat->isDirty())
+        flushsbat();
+    if (dirtree->isDirty())
+    {
+        std::vector<unsigned int> blocks;
+        blocks = bbat->follow(header->dirent_start);
+        unsigned int sb_start = 0xffffffff;
+        if (sb_blocks.size() > 0)
+            sb_start = sb_blocks[0];
+        dirtree->flush(blocks, this, bbat->blockSize, sb_start, (unsigned int) sb_blocks.size()*bbat->blockSize);
+    }
+    if (mbatDirty && mbat_blocks.size() > 0)
+    {
+        unsigned int nBytes = bbat->blockSize * (unsigned int) mbat_blocks.size();
+        unsigned char *buffer = new unsigned char[nBytes];
+        unsigned int sIdx = 0;
+        unsigned int dcount = 0;
+        unsigned blockCapacity = bbat->blockSize / sizeof(unsigned int) - 1;
+        unsigned blockIdx = 0;
+        for (unsigned mdIdx = 0; mdIdx < mbat_data.size(); mdIdx++)
+        {
+            writeU32(buffer + sIdx, mbat_data[mdIdx]);
+            sIdx += 4;
+            dcount++;
+            if (dcount == blockCapacity)
+            {
+                blockIdx++;
+                if (blockIdx == mbat_blocks.size())
+                    writeU32(buffer + sIdx, AllocTable::Eof);
+                else
+                    writeU32(buffer + sIdx, mbat_blocks[blockIdx]);
+                sIdx += 4;
+                dcount = 0;
+            }
+        }
+        saveBigBlocks(mbat_blocks, 0, buffer, nBytes);
+        delete[] buffer;
+        mbatDirty = false;
+    }
+    file.flush();
+    fileCheck(file);
 
   /* Note on Microsoft implementation:
      - directory entries are stored in the last block(s)
@@ -1460,67 +1460,67 @@ StreamIO* StorageIO::streamIO( const std::string& name, bool bCreate, int stream
 
 bool StorageIO::deleteByName(const std::string& fullName)
 {
-	if (!fullName.length())
-		return false;
-	if (!writeable)
-		return false;
-	DirEntry* entry = dirtree->entry(fullName);
-	if (!entry)
-		return false;
-	bool retVal;
-	if (entry->dir)
-		retVal = deleteNode(entry, fullName);
-	else
-		retVal = deleteLeaf(entry, fullName);
-	if (retVal)
-		flush();
-	return retVal;
+    if (!fullName.length())
+        return false;
+    if (!writeable)
+        return false;
+    DirEntry* entry = dirtree->entry(fullName);
+    if (!entry)
+        return false;
+    bool retVal;
+    if (entry->dir)
+        retVal = deleteNode(entry, fullName);
+    else
+        retVal = deleteLeaf(entry, fullName);
+    if (retVal)
+        flush();
+    return retVal;
 }
 
 bool StorageIO::deleteNode(DirEntry *entry, const std::string& fullName)
 {
-	std::string lclName = fullName;
-	if (lclName[lclName.size()-1] != '/')
-		lclName += '/';
-	bool retVal = true;
-	while (entry->child && entry->child < dirtree->entryCount())
-	{
-		DirEntry* childEnt = dirtree->entry(entry->child);
-		std::string childFullName = lclName + childEnt->name;
-		if (childEnt->dir)
-			retVal = deleteNode(childEnt, childFullName);
-		else
-			retVal = deleteLeaf(childEnt, childFullName);
-		if (!retVal)
-			return false;
-	}
-	dirtree->deleteEntry(entry, fullName, bbat->blockSize);
-	return retVal;
+    std::string lclName = fullName;
+    if (lclName[lclName.size()-1] != '/')
+        lclName += '/';
+    bool retVal = true;
+    while (entry->child && entry->child < dirtree->entryCount())
+    {
+        DirEntry* childEnt = dirtree->entry(entry->child);
+        std::string childFullName = lclName + childEnt->name;
+        if (childEnt->dir)
+            retVal = deleteNode(childEnt, childFullName);
+        else
+            retVal = deleteLeaf(childEnt, childFullName);
+        if (!retVal)
+            return false;
+    }
+    dirtree->deleteEntry(entry, fullName, bbat->blockSize);
+    return retVal;
 }
 
 bool StorageIO::deleteLeaf(DirEntry *entry, const std::string& fullName)
 {
-	std::vector<unsigned int> blocks;
-	if (entry->size >= header->threshold)
-	{
-		blocks = bbat->follow(entry->start);
-		for (unsigned idx = 0; idx < blocks.size(); idx++)
-		{
-			bbat->set(blocks[idx], AllocTable::Avail);
-			bbat->markAsDirty(idx, bbat->blockSize);
-		}
-	}
-	else
-	{
-		blocks = sbat->follow(entry->start);
-		for (unsigned idx = 0; idx < blocks.size(); idx++)
-		{
-			sbat->set(blocks[idx], AllocTable::Avail);
-			sbat->markAsDirty(idx, bbat->blockSize);
-		}
-	}
-	dirtree->deleteEntry(entry, fullName, bbat->blockSize);
-	return true;
+    std::vector<unsigned int> blocks;
+    if (entry->size >= header->threshold)
+    {
+        blocks = bbat->follow(entry->start);
+        for (unsigned idx = 0; idx < blocks.size(); idx++)
+        {
+            bbat->set(blocks[idx], AllocTable::Avail);
+            bbat->markAsDirty(idx, bbat->blockSize);
+        }
+    }
+    else
+    {
+        blocks = sbat->follow(entry->start);
+        for (unsigned idx = 0; idx < blocks.size(); idx++)
+        {
+            sbat->set(blocks[idx], AllocTable::Avail);
+            sbat->markAsDirty(idx, bbat->blockSize);
+        }
+    }
+    dirtree->deleteEntry(entry, fullName, bbat->blockSize);
+    return true;
 }
 
 unsigned int StorageIO::loadBigBlocks( std::vector<unsigned int> blocks,
@@ -1544,8 +1544,8 @@ unsigned int StorageIO::loadBigBlocks( std::vector<unsigned int> blocks,
         p = filesize - pos;
     file.seekg( pos );
     file.read( (char*)data + bytes, p );
-	fileCheck(file);
-	// should use gcount to see how many bytes were really returned - eof check...
+    fileCheck(file);
+    // should use gcount to see how many bytes were really returned - eof check...
     bytes += p;
   }
 
@@ -1583,18 +1583,18 @@ unsigned int StorageIO::saveBigBlocks( std::vector<unsigned int> blocks, unsigne
   {
     unsigned int block = blocks[i];
     unsigned int pos =  (bbat->blockSize * ( block+1 ) ) + offset;
-	unsigned int maxWrite = bbat->blockSize - offset;
-	unsigned int tobeWritten = len - bytes;
-	if (tobeWritten > maxWrite)
-		tobeWritten = maxWrite;
+    unsigned int maxWrite = bbat->blockSize - offset;
+    unsigned int tobeWritten = len - bytes;
+    if (tobeWritten > maxWrite)
+        tobeWritten = maxWrite;
     file.seekp( pos );
     file.write( (char*)data + bytes, tobeWritten );
-	fileCheck(file);
+    fileCheck(file);
 
     bytes += tobeWritten;
-	offset = 0;
-	if (filesize < pos + tobeWritten)
-		filesize = pos + tobeWritten;
+    offset = 0;
+    if (filesize < pos + tobeWritten)
+        filesize = pos + tobeWritten;
   }
 
   return bytes;
@@ -1603,14 +1603,14 @@ unsigned int StorageIO::saveBigBlocks( std::vector<unsigned int> blocks, unsigne
 
 unsigned int StorageIO::saveBigBlock( unsigned int block, unsigned int offset, unsigned char* data, unsigned int len )
 {
-	if ( !data ) return 0;
-	fileCheck(file);
-	if ( !file.good() ) return 0;
-	//wrap call for saveBigBlocks
-	std::vector<unsigned int> blocks;
-	blocks.resize( 1 );
-	blocks[ 0 ] = block;
-	return saveBigBlocks(blocks, offset, data, len );
+    if ( !data ) return 0;
+    fileCheck(file);
+    if ( !file.good() ) return 0;
+    //wrap call for saveBigBlocks
+    std::vector<unsigned int> blocks;
+    blocks.resize( 1 );
+    blocks[ 0 ] = block;
+    return saveBigBlocks(blocks, offset, data, len );
 }
 
 // return number of bytes which has been read
@@ -1671,7 +1671,7 @@ unsigned int StorageIO::loadSmallBlock( unsigned int block,
 
 
 unsigned int StorageIO::saveSmallBlocks( std::vector<unsigned int> blocks, unsigned int offset, 
-										unsigned char* data, unsigned int len, int startAtBlock )
+                                        unsigned char* data, unsigned int len, int startAtBlock )
 {
   // sentinel
   if( !data ) return 0;
@@ -1690,154 +1690,154 @@ unsigned int StorageIO::saveSmallBlocks( std::vector<unsigned int> blocks, unsig
     unsigned int bbindex = pos / bbat->blockSize;
     if( bbindex >= sb_blocks.size() ) break;
     unsigned offset2 = pos % bbat->blockSize;
-	unsigned int maxWrite = sbat->blockSize - offset;
-	unsigned int tobeWritten = len - bytes;
-	if (tobeWritten > maxWrite)
-		tobeWritten = maxWrite;
-	saveBigBlock( sb_blocks[ bbindex ], offset2 + offset, data + bytes, tobeWritten);
+    unsigned int maxWrite = sbat->blockSize - offset;
+    unsigned int tobeWritten = len - bytes;
+    if (tobeWritten > maxWrite)
+        tobeWritten = maxWrite;
+    saveBigBlock( sb_blocks[ bbindex ], offset2 + offset, data + bytes, tobeWritten);
     bytes += tobeWritten;
-	offset = 0;
-	if (filesize < pos + tobeWritten)
-		filesize = pos + tobeWritten;
+    offset = 0;
+    if (filesize < pos + tobeWritten)
+        filesize = pos + tobeWritten;
   }
   return bytes;
 }
 
 unsigned int StorageIO::saveSmallBlock( unsigned int block, unsigned int offset, unsigned char* data, unsigned int len )
 {
-	if ( !data ) return 0;
-	fileCheck(file);
-	if ( !file.good() ) return 0;
-	//wrap call for saveSmallBlocks
-	std::vector<unsigned int> blocks;
-	blocks.resize( 1 );
-	blocks[ 0 ] = block;
-	return saveSmallBlocks(blocks, offset, data, len );
+    if ( !data ) return 0;
+    fileCheck(file);
+    if ( !file.good() ) return 0;
+    //wrap call for saveSmallBlocks
+    std::vector<unsigned int> blocks;
+    blocks.resize( 1 );
+    blocks[ 0 ] = block;
+    return saveSmallBlocks(blocks, offset, data, len );
 }
 
 void StorageIO::flushbbat()
 {
-	std::vector<unsigned int> blocks;
-	blocks = getbbatBlocks(false);
-	bbat->flush(blocks, this, bbat->blockSize);
+    std::vector<unsigned int> blocks;
+    blocks = getbbatBlocks(false);
+    bbat->flush(blocks, this, bbat->blockSize);
 }
 
 void StorageIO::flushsbat()
 {
-	std::vector<unsigned int> blocks;
-	blocks = bbat->follow(header->sbat_start);
-	sbat->flush(blocks, this, bbat->blockSize);
+    std::vector<unsigned int> blocks;
+    blocks = bbat->follow(header->sbat_start);
+    sbat->flush(blocks, this, bbat->blockSize);
 }
 
 std::vector<unsigned int> StorageIO::getbbatBlocks(bool bLoading)
 {
-	std::vector<unsigned int> blocks;
-	// find blocks allocated to store big bat
-	// the first 109 blocks are in header, the rest in meta bat
-	blocks.clear();
-	blocks.resize( header->num_bat );
+    std::vector<unsigned int> blocks;
+    // find blocks allocated to store big bat
+    // the first 109 blocks are in header, the rest in meta bat
+    blocks.clear();
+    blocks.resize( header->num_bat );
 
-	for( unsigned i = 0; i < 109; i++ )
-	{
-		if( i >= header->num_bat ) 
-			break;
-		else 
-			blocks[i] = header->bb_blocks[i];
-	}
-	if (bLoading)
-	{
-		mbat_blocks.clear();
-		mbat_data.clear();
-		if( (header->num_bat > 109) && (header->num_mbat > 0) ) 
-		{
-			unsigned char* buffer2 = new unsigned char[ bbat->blockSize ];
-			unsigned k = 109;
-			unsigned sector;
-			unsigned mdidx = 0;
-			for( unsigned r = 0; r < header->num_mbat; r++ )
-			{
-				if(r == 0) // 1st meta bat location is in file header.
-					sector = header->mbat_start;
-				else      // next meta bat location is the last current block value.
-				{
-					sector = blocks[--k];
-					mdidx--;
-				}
-				mbat_blocks.push_back(sector);
-				mbat_data.resize(mbat_blocks.size()*(bbat->blockSize/4));
-				loadBigBlock( sector, buffer2, bbat->blockSize );
-				for( unsigned s=0; s < bbat->blockSize; s+=4 )
-				{
-					if( k >= header->num_bat )
-						break;
-					else
-					{
-						blocks[k] = readU32( buffer2 + s );
-						mbat_data[mdidx++] = blocks[k];
-						k++;
-					}
-				}  
-			}
-			if (mbat_data.size() != mdidx) mbat_data.resize(mdidx);
-			delete[] buffer2;
-		}
-	}
-	else
-	{
-		unsigned i = 109;
-		for (unsigned int idx = 0; idx < mbat_data.size(); idx++)
-		{
-			blocks[i++] = mbat_data[idx];
-			if (i == header->num_bat)
-				break;
-		}
-	}
-	return blocks;
+    for( unsigned i = 0; i < 109; i++ )
+    {
+        if( i >= header->num_bat ) 
+            break;
+        else 
+            blocks[i] = header->bb_blocks[i];
+    }
+    if (bLoading)
+    {
+        mbat_blocks.clear();
+        mbat_data.clear();
+        if( (header->num_bat > 109) && (header->num_mbat > 0) ) 
+        {
+            unsigned char* buffer2 = new unsigned char[ bbat->blockSize ];
+            unsigned k = 109;
+            unsigned sector;
+            unsigned mdidx = 0;
+            for( unsigned r = 0; r < header->num_mbat; r++ )
+            {
+                if(r == 0) // 1st meta bat location is in file header.
+                    sector = header->mbat_start;
+                else      // next meta bat location is the last current block value.
+                {
+                    sector = blocks[--k];
+                    mdidx--;
+                }
+                mbat_blocks.push_back(sector);
+                mbat_data.resize(mbat_blocks.size()*(bbat->blockSize/4));
+                loadBigBlock( sector, buffer2, bbat->blockSize );
+                for( unsigned s=0; s < bbat->blockSize; s+=4 )
+                {
+                    if( k >= header->num_bat )
+                        break;
+                    else
+                    {
+                        blocks[k] = readU32( buffer2 + s );
+                        mbat_data[mdidx++] = blocks[k];
+                        k++;
+                    }
+                }  
+            }
+            if (mbat_data.size() != mdidx) mbat_data.resize(mdidx);
+            delete[] buffer2;
+        }
+    }
+    else
+    {
+        unsigned i = 109;
+        for (unsigned int idx = 0; idx < mbat_data.size(); idx++)
+        {
+            blocks[i++] = mbat_data[idx];
+            if (i == header->num_bat)
+                break;
+        }
+    }
+    return blocks;
 }
 
 unsigned int StorageIO::ExtendFile( std::vector<unsigned int> *chain )
 {
-	unsigned int newblockIdx = bbat->unused();
-	bbat->set(newblockIdx, AllocTable::Eof);
-	unsigned int bbidx = newblockIdx / (bbat->blockSize / sizeof(unsigned int));
-	while (bbidx >= header->num_bat)
-		addbbatBlock();
-	bbat->markAsDirty(newblockIdx, bbat->blockSize);
-	if (chain->size() > 0)
-	{
-		bbat->set((*chain)[chain->size()-1], newblockIdx);
-		bbat->markAsDirty((*chain)[chain->size()-1], bbat->blockSize);
-	}
-	chain->push_back(newblockIdx);
-	return newblockIdx;
+    unsigned int newblockIdx = bbat->unused();
+    bbat->set(newblockIdx, AllocTable::Eof);
+    unsigned int bbidx = newblockIdx / (bbat->blockSize / sizeof(unsigned int));
+    while (bbidx >= header->num_bat)
+        addbbatBlock();
+    bbat->markAsDirty(newblockIdx, bbat->blockSize);
+    if (chain->size() > 0)
+    {
+        bbat->set((*chain)[chain->size()-1], newblockIdx);
+        bbat->markAsDirty((*chain)[chain->size()-1], bbat->blockSize);
+    }
+    chain->push_back(newblockIdx);
+    return newblockIdx;
 }
 
 void StorageIO::addbbatBlock()
 {
-	unsigned int newblockIdx = bbat->unused();
-	bbat->set(newblockIdx, AllocTable::MetaBat);
+    unsigned int newblockIdx = bbat->unused();
+    bbat->set(newblockIdx, AllocTable::MetaBat);
 
-	if (header->num_bat < 109)
-		header->bb_blocks[header->num_bat] = newblockIdx;
-	else
-	{
-		mbatDirty = true;
-		mbat_data.push_back(newblockIdx);
-		unsigned metaIdx = header->num_bat - 109;
-		unsigned idxPerBlock = bbat->blockSize / sizeof(unsigned int) - 1; //reserve room for index to next block
-		unsigned idxBlock = metaIdx / idxPerBlock;
-		if (idxBlock == mbat_blocks.size())
-		{
-			unsigned int newmetaIdx = bbat->unused();
-			bbat->set(newmetaIdx, AllocTable::MetaBat);
-			mbat_blocks.push_back(newmetaIdx);
-			if (header->num_mbat == 0)
-				header->mbat_start = newmetaIdx;
-			header->num_mbat++;
-		}
-	}
-	header->num_bat++;
-	header->dirty = true;
+    if (header->num_bat < 109)
+        header->bb_blocks[header->num_bat] = newblockIdx;
+    else
+    {
+        mbatDirty = true;
+        mbat_data.push_back(newblockIdx);
+        unsigned metaIdx = header->num_bat - 109;
+        unsigned idxPerBlock = bbat->blockSize / sizeof(unsigned int) - 1; //reserve room for index to next block
+        unsigned idxBlock = metaIdx / idxPerBlock;
+        if (idxBlock == mbat_blocks.size())
+        {
+            unsigned int newmetaIdx = bbat->unused();
+            bbat->set(newmetaIdx, AllocTable::MetaBat);
+            mbat_blocks.push_back(newmetaIdx);
+            if (header->num_mbat == 0)
+                header->mbat_start = newmetaIdx;
+            header->num_mbat++;
+        }
+    }
+    header->num_bat++;
+    header->dirty = true;
 }
 
 
@@ -1871,72 +1871,72 @@ StreamIO::~StreamIO()
 
 void StreamIO::setSize(unsigned int newSize)
 {
-	bool bThresholdCrossed = false;
-	bool bOver = false;
+    bool bThresholdCrossed = false;
+    bool bOver = false;
 
-	if(!io->writeable )
-		return;
-	DirEntry *entry = io->dirtree->entry(entryIdx);
-	if (newSize >= io->header->threshold && entry->size < io->header->threshold)
-	{
-		bThresholdCrossed = true;
-		bOver = true;
-	}
-	else if (newSize < io->header->threshold && entry->size >= io->header->threshold)
-	{
-		bThresholdCrossed = true;
-		bOver = false;
-	}
-	if (bThresholdCrossed)
-	{
-		// first, read what is already in the stream, limited by the requested new size. Note
-		// that the read can work precisely because we have not yet reset the size.
-		unsigned int len = newSize;
-		if (len > entry->size)
-			len = entry->size;
-		unsigned char *buffer = 0;
-		unsigned int savePos = tell();
-		if (len)
-		{
-			buffer = new unsigned char[len];
-			seek(0);
-			read(buffer, len);
-		}
-		// Now get rid of the existing blocks
-		if (bOver)
-		{
-			for (unsigned int idx = 0; idx < blocks.size(); idx++)
-			{
-				io->sbat->set(blocks[idx], AllocTable::Avail);
-				io->sbat->markAsDirty(idx, io->bbat->blockSize);
-			}
-		}
-		else
-		{
-			for (unsigned int idx = 0; idx < blocks.size(); idx++)
-			{
-				io->bbat->set(blocks[idx], AllocTable::Avail);
-				io->bbat->markAsDirty(idx, io->bbat->blockSize);
-			}
-		}
-		blocks.clear();
-		entry->start = DirTree::End;
-		// Now change the size, and write the old data back into the stream, if any
-		entry->size = newSize;
-		io->dirtree->markAsDirty(io->dirtree->indexOf(entry), io->bbat->blockSize);
-		if (len)
-		{
-			write(0, buffer, len);
-			delete buffer;
-		}
-		if (savePos <= entry->size)
-			seek(savePos);
-	}
-	else if (entry->size != newSize) //simple case - no threshold was crossed, so just change the size
-	{
-		entry->size = newSize;
-		io->dirtree->markAsDirty(io->dirtree->indexOf(entry), io->bbat->blockSize);
-	}
+    if(!io->writeable )
+        return;
+    DirEntry *entry = io->dirtree->entry(entryIdx);
+    if (newSize >= io->header->threshold && entry->size < io->header->threshold)
+    {
+        bThresholdCrossed = true;
+        bOver = true;
+    }
+    else if (newSize < io->header->threshold && entry->size >= io->header->threshold)
+    {
+        bThresholdCrossed = true;
+        bOver = false;
+    }
+    if (bThresholdCrossed)
+    {
+        // first, read what is already in the stream, limited by the requested new size. Note
+        // that the read can work precisely because we have not yet reset the size.
+        unsigned int len = newSize;
+        if (len > entry->size)
+            len = entry->size;
+        unsigned char *buffer = 0;
+        unsigned int savePos = tell();
+        if (len)
+        {
+            buffer = new unsigned char[len];
+            seek(0);
+            read(buffer, len);
+        }
+        // Now get rid of the existing blocks
+        if (bOver)
+        {
+            for (unsigned int idx = 0; idx < blocks.size(); idx++)
+            {
+                io->sbat->set(blocks[idx], AllocTable::Avail);
+                io->sbat->markAsDirty(idx, io->bbat->blockSize);
+            }
+        }
+        else
+        {
+            for (unsigned int idx = 0; idx < blocks.size(); idx++)
+            {
+                io->bbat->set(blocks[idx], AllocTable::Avail);
+                io->bbat->markAsDirty(idx, io->bbat->blockSize);
+            }
+        }
+        blocks.clear();
+        entry->start = DirTree::End;
+        // Now change the size, and write the old data back into the stream, if any
+        entry->size = newSize;
+        io->dirtree->markAsDirty(io->dirtree->indexOf(entry), io->bbat->blockSize);
+        if (len)
+        {
+            write(0, buffer, len);
+            delete buffer;
+        }
+        if (savePos <= entry->size)
+            seek(savePos);
+    }
+    else if (entry->size != newSize) //simple case - no threshold was crossed, so just change the size
+    {
+        entry->size = newSize;
+        io->dirtree->markAsDirty(io->dirtree->indexOf(entry), io->bbat->blockSize);
+    }
 
 }
 
@@ -1980,7 +1980,7 @@ unsigned int StreamIO::read( unsigned int pos, unsigned char* data, unsigned int
   
   DirEntry *entry = io->dirtree->entry(entryIdx);
   if (pos + maxlen > entry->size)
-	  maxlen = entry->size - pos;
+      maxlen = entry->size - pos;
   if ( entry->size < io->header->threshold )
   {
     // small file
@@ -2052,65 +2052,65 @@ unsigned int StreamIO::write( unsigned int pos, unsigned char* data, unsigned in
 
   DirEntry *entry = io->dirtree->entry(entryIdx);
   if (pos + len > entry->size)
-	  setSize(pos + len); //reset size, possibly changing from small to large blocks
+      setSize(pos + len); //reset size, possibly changing from small to large blocks
   unsigned int totalbytes = 0;
   if ( entry->size < io->header->threshold )
   {
     // small file
     unsigned int index = (pos + len - 1) / io->sbat->blockSize;
-	while (index >= blocks.size())
-	{
-		unsigned int nblock = io->sbat->unused();
-		if (blocks.size() > 0)
-		{
-			io->sbat->set(blocks[blocks.size()-1], nblock);
-			io->sbat->markAsDirty(blocks[blocks.size()-1], io->bbat->blockSize);
-		}
-		io->sbat->set(nblock, AllocTable::Eof);
-		io->sbat->markAsDirty(nblock, io->bbat->blockSize);
-		blocks.resize(blocks.size()+1);
-		blocks[blocks.size()-1] = nblock;
-		unsigned int bbidx = nblock / (io->bbat->blockSize / sizeof(unsigned int));
-		while (bbidx >= io->header->num_sbat)
-		{
-			std::vector<unsigned int> sbat_blocks = io->bbat->follow(io->header->sbat_start);
-			io->ExtendFile(&sbat_blocks);
-			io->header->num_sbat++;
-		}
-		unsigned int sidx = nblock * io->sbat->blockSize / io->bbat->blockSize;
-		while (sidx >= io->sb_blocks.size())
-			io->ExtendFile(&io->sb_blocks);
-	}
+    while (index >= blocks.size())
+    {
+        unsigned int nblock = io->sbat->unused();
+        if (blocks.size() > 0)
+        {
+            io->sbat->set(blocks[blocks.size()-1], nblock);
+            io->sbat->markAsDirty(blocks[blocks.size()-1], io->bbat->blockSize);
+        }
+        io->sbat->set(nblock, AllocTable::Eof);
+        io->sbat->markAsDirty(nblock, io->bbat->blockSize);
+        blocks.resize(blocks.size()+1);
+        blocks[blocks.size()-1] = nblock;
+        unsigned int bbidx = nblock / (io->bbat->blockSize / sizeof(unsigned int));
+        while (bbidx >= io->header->num_sbat)
+        {
+            std::vector<unsigned int> sbat_blocks = io->bbat->follow(io->header->sbat_start);
+            io->ExtendFile(&sbat_blocks);
+            io->header->num_sbat++;
+        }
+        unsigned int sidx = nblock * io->sbat->blockSize / io->bbat->blockSize;
+        while (sidx >= io->sb_blocks.size())
+            io->ExtendFile(&io->sb_blocks);
+    }
     unsigned int offset = pos % io->sbat->blockSize;
-	index = pos / io->sbat->blockSize;
-	//if (index == 0)
-		totalbytes = io->saveSmallBlocks(blocks, offset, data, len, index);
+    index = pos / io->sbat->blockSize;
+    //if (index == 0)
+        totalbytes = io->saveSmallBlocks(blocks, offset, data, len, index);
   }
   else
   {
     unsigned int index = (pos + len - 1) / io->bbat->blockSize;
-	while (index >= blocks.size())
-		io->ExtendFile(&blocks);
+    while (index >= blocks.size())
+        io->ExtendFile(&blocks);
     unsigned int offset = pos % io->bbat->blockSize;
-	unsigned int remainder = len;
-	index = pos / io->bbat->blockSize;
+    unsigned int remainder = len;
+    index = pos / io->bbat->blockSize;
     while( remainder > 0 )
     {
       if( index >= blocks.size() ) break;
-	  unsigned int count = io->bbat->blockSize - offset;
-	  if ( remainder < count )
-		  count = remainder;
+      unsigned int count = io->bbat->blockSize - offset;
+      if ( remainder < count )
+          count = remainder;
       io->saveBigBlock( blocks[index], offset, data + totalbytes, count );
       totalbytes += count;
-	  remainder -= count;
+      remainder -= count;
       index++;
       offset = 0;
     }
   }
   if (blocks.size() > 0 && entry->start != blocks[0])
   {
-	  entry->start = blocks[0];
-	  io->dirtree->markAsDirty(io->dirtree->indexOf(entry), io->bbat->blockSize);
+      entry->start = blocks[0];
+      io->dirtree->markAsDirty(io->dirtree->indexOf(entry), io->bbat->blockSize);
   }
   m_pos += len;
   return totalbytes;
@@ -2119,7 +2119,7 @@ unsigned int StreamIO::write( unsigned int pos, unsigned char* data, unsigned in
 
 void StreamIO::flush()
 {
-	io->flush();
+    io->flush();
 }
 
 void StreamIO::updateCache()
@@ -2186,13 +2186,13 @@ bool Storage::isDirectory( const std::string& name )
 
 bool Storage::exists( const std::string& name )
 {
-	DirEntry* e = io->dirtree->entry( name, false );
-	return (e != 0);
+    DirEntry* e = io->dirtree->entry( name, false );
+    return (e != 0);
 }
 
 bool Storage::isWriteable()
 {
-	return io->writeable;
+    return io->writeable;
 }
 
 bool Storage::deleteByName( const std::string& name )
@@ -2201,15 +2201,15 @@ bool Storage::deleteByName( const std::string& name )
 }
 
 void Storage::GetStats(unsigned int *pEntries, unsigned int *pUnusedEntries,
-	  unsigned int *pBigBlocks, unsigned int *pUnusedBigBlocks,
-	  unsigned int *pSmallBlocks, unsigned int *pUnusedSmallBlocks)
+      unsigned int *pBigBlocks, unsigned int *pUnusedBigBlocks,
+      unsigned int *pSmallBlocks, unsigned int *pUnusedSmallBlocks)
 {
-	*pEntries = io->dirtree->entryCount();
-	*pUnusedEntries = io->dirtree->unusedEntryCount();
-	*pBigBlocks = io->bbat->count();
-	*pUnusedBigBlocks = io->bbat->unusedCount();
-	*pSmallBlocks = io->sbat->count();
-	*pUnusedSmallBlocks = io->sbat->unusedCount();
+    *pEntries = io->dirtree->entryCount();
+    *pUnusedEntries = io->dirtree->unusedEntryCount();
+    *pBigBlocks = io->bbat->count();
+    *pUnusedBigBlocks = io->bbat->unusedCount();
+    *pSmallBlocks = io->sbat->count();
+    *pUnusedSmallBlocks = io->sbat->unusedCount();
 }
 
 // =========== Stream ==========
@@ -2243,21 +2243,21 @@ void Stream::seek( unsigned long newpos )
 
 unsigned long Stream::size()
 {
-	if (!io)
-		return 0;
-	DirEntry *entry = io->io->dirtree->entry(io->entryIdx);
-	return entry->size;
+    if (!io)
+        return 0;
+    DirEntry *entry = io->io->dirtree->entry(io->entryIdx);
+    return entry->size;
 }
 
 void Stream::setSize(long newSize)
 {
-	if (!io)
-		return;
-	if (newSize < 0)
-		return;
-	if (newSize > UINT_MAX)
-		return;
-	io->setSize((unsigned int) newSize);
+    if (!io)
+        return;
+    if (newSize < 0)
+        return;
+    if (newSize > UINT_MAX)
+        return;
+    io->setSize((unsigned int) newSize);
 }
 
 int Stream::getch()
@@ -2272,13 +2272,13 @@ unsigned int Stream::read( unsigned char* data, unsigned int maxlen )
 
 unsigned int Stream::write( unsigned char* data, unsigned int len )
 {
-	return io ? io->write( data, len ) : 0;
+    return io ? io->write( data, len ) : 0;
 }
 
 void Stream::flush()
 {
-	if (io)
-		io->flush();
+    if (io)
+        io->flush();
 }
 
 bool Stream::eof()
