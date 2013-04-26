@@ -10,7 +10,10 @@
    Considerable rework to allow for creation and updating of structured storage: Stephen Baum
    Copyright 2013 <sbaum@gmail.com>
 
-   Version: 0.5
+   Added GetAllStreams, reworked datatypes
+   Copyright 2013 Felix Gorny from Bitplane
+   
+   Version: 0.5.1
 
    Redistribution and use in source and binary forms, with or without 
    modification, are permitted provided that the following conditions 
@@ -40,11 +43,24 @@
 #ifndef POLE_H
 #define POLE_H
 
+#include <cstdio>
 #include <string>
 #include <list>
 
 namespace POLE
 {
+
+#if defined WIN32 || defined WIN64 || defined _WIN32 || defined _WIN64 || defined _MSVC
+typedef __int32 int32;
+typedef __int64 int64;
+typedef unsigned __int32 uint32;
+typedef unsigned __int64 uint64;
+#else
+typedef int int32;
+typedef long long int64;
+typedef unsigned int uint32;
+typedef unsigned long long uint64;
+#endif
 
 class StorageIO;
 class Stream;
@@ -117,9 +133,11 @@ public:
    * should be defragmented.
    */
 
-  void GetStats(unsigned int *pEntries, unsigned int *pUnusedEntries,
-      unsigned int *pBigBlocks, unsigned int *pUnusedBigBlocks,
-      unsigned int *pSmallBlocks, unsigned int *pUnusedSmallBlocks);
+  void GetStats(uint64 *pEntries, uint64 *pUnusedEntries,
+      uint64 *pBigBlocks, uint64 *pUnusedBigBlocks,
+      uint64 *pSmallBlocks, uint64 *pUnusedSmallBlocks);
+
+  std::list<std::string> GetAllStreams( const std::string& storageName );
 
 private:
   StorageIO* io;
@@ -141,7 +159,7 @@ public:
    * Creates a new stream.
    */
   // name must be absolute, e.g "/Workbook"
-  Stream( Storage* storage, const std::string& name, bool bCreate = false, long streamSize = 0);
+  Stream( Storage* storage, const std::string& name, bool bCreate = false, int64 streamSize = 0);
 
   /**
    * Destroys the stream.
@@ -156,39 +174,39 @@ public:
   /**
    * Returns the stream size.
    **/
-  unsigned long size();
+  uint64 size();
 
   /**
    * Changes the stream size (note this is done automatically if you write beyond the old size.
    * Use this primarily as a preamble to rewriting a stream that is already open. Of course, you
    * could simply delete the stream first).
    **/
-  void setSize(long newSize);
+  void setSize(int64 newSize);
 
   /**
    * Returns the current read/write position.
    **/
-  unsigned long tell();
+  uint64 tell();
 
   /**
    * Sets the read/write position.
    **/
-  void seek( unsigned long pos ); 
+  void seek( uint64 pos ); 
 
   /**
    * Reads a byte.
    **/
-  int getch();
+  int64 getch();
 
   /**
    * Reads a block of data.
    **/
-  unsigned int read( unsigned char* data, unsigned int maxlen );
+  uint64 read( unsigned char* data, uint64 maxlen );
   
   /**
    * Writes a block of data.
    **/
-  unsigned int write( unsigned char* data, unsigned int len );
+  uint64 write( unsigned char* data, uint64 len );
 
   /**
    * Makes sure that any changes for the stream (and the structured storage) have been written to disk.
