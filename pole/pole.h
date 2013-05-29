@@ -8,12 +8,15 @@
    Copyright 2010 <Michel.Boudinot@inaf.cnrs-gif.fr>
 
    Considerable rework to allow for creation and updating of structured storage: Stephen Baum
-   Copyright 2013 <sbaum@gmail.com>
+   Copyright 2013 <srbaum@gmail.com>
 
    Added GetAllStreams, reworked datatypes
    Copyright 2013 Felix Gorny from Bitplane
    
-   Version: 0.5.1
+   More datatype changes to allow for 32 and 64 bit code, some fixes involving incremental updates, flushing
+   Copyright 2013 <srbaum@gmail.com>
+   
+   Version: 0.5.2
 
    Redistribution and use in source and binary forms, with or without 
    modification, are permitted provided that the following conditions 
@@ -61,6 +64,8 @@ typedef long long int64;
 typedef unsigned int uint32;
 typedef unsigned long long uint64;
 #endif
+
+typedef uint64 t_offset;
 
 class StorageIO;
 class Stream;

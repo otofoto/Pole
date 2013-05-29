@@ -13,7 +13,10 @@
    Added GetAllStreams, reworked datatypes
    Copyright 2013 Felix Gorny from Bitplane
    
-   Version: 0.5.1
+   More datatype changes to allow for 32 and 64 bit code, some fixes involving incremental updates, flushing
+   Copyright 2013 <srbaum@gmail.com>
+   
+   Version: 0.5.2
 
    Redistribution and use in source and binary forms, with or without 
    modification, are permitted provided that the following conditions 
@@ -119,11 +122,12 @@ class AllocTable
 class DirEntry
 {
   public:
-    bool valid;            // false if invalid (should be skipped)
-    std::string name;      // the name, not in unicode anymore 
-    bool dir;              // true if directory   
-    uint64 size;    // size (not valid if directory)
-    uint64 start;   // starting block
+    DirEntry(): valid(), name(), dir(), size(), start(), prev(), next(), child() {}
+    bool valid;          // false if invalid (should be skipped)
+    std::string name;    // the name, not in unicode anymore 
+    bool dir;            // true if directory   
+    uint64 size;         // size (not valid if directory)
+    uint64 start;        // starting block
     uint64 prev;         // previous sibling
     uint64 next;         // next sibling
     uint64 child;        // first child
@@ -325,22 +329,22 @@ static const unsigned char pole_magic[] =
 // =========== Header ==========
 
 Header::Header()
-{
-  b_shift = 9;      // [1EH,02] size of sectors in power-of-two; typically 9 indicating 512-byte sectors
-  s_shift = 6;      // [20H,02] size of mini-sectors in power-of-two; typically 6 indicating 64-byte mini-sectors
-  num_bat = 0;      // [2CH,04] number of SECTs in the FAT chain
-  dirent_start = 0; // [30H,04] first SECT in the directory chain
-  threshold = 4096; // [38H,04] maximum size for a mini stream; typically 4096 bytes
-  sbat_start = 0;   // [3CH,04] first SECT in the MiniFAT chain
-  num_sbat = 0;     // [40H,04] number of SECTs in the MiniFAT chain
-  mbat_start = AllocTable::Eof;   // [44H,04] first SECT in the DIFAT chain
-  num_mbat = 0;     // [48H,04] number of SECTs in the DIFAT chain
+:   b_shift(9),                 // [1EH,02] size of sectors in power-of-two; typically 9 indicating 512-byte sectors
+    s_shift(6),                 // [20H,02] size of mini-sectors in power-of-two; typically 6 indicating 64-byte mini-sectors
+    num_bat(0),                 // [2CH,04] number of SECTs in the FAT chain
+    dirent_start(0),            // [30H,04] first SECT in the directory chain
+    threshold(4096),            // [38H,04] maximum size for a mini stream; typically 4096 bytes
+    sbat_start(0),              // [3CH,04] first SECT in the MiniFAT chain
+    num_sbat(0),                // [40H,04] number of SECTs in the MiniFAT chain
+    mbat_start(AllocTable::Eof),// [44H,04] first SECT in the DIFAT chain
+    num_mbat(0),                // [48H,04] number of SECTs in the DIFAT chain
+    dirty(true)	
 
-  for( unsigned i = 0; i < 8; i++ )
+{
+  for( unsigned int i = 0; i < 8; i++ )
     id[i] = pole_magic[i];  
-  for( unsigned i=0; i<109; i++ )
+  for( unsigned int i=0; i<109; i++ )
     bb_blocks[i] = AllocTable::Avail;
-  dirty = true;
 }
 
 bool Header::valid()
@@ -367,11 +371,11 @@ void Header::load( const unsigned char* buffer ) {
   mbat_start   = readU32( buffer + 0x44 ); // [44H,04] first SECT in the DIFAT chain
   num_mbat     = readU32( buffer + 0x48 ); // [48H,04] number of SECTs in the DIFAT chain
   
-  for( unsigned i = 0; i < 8; i++ )
+  for( unsigned int i = 0; i < 8; i++ )
     id[i] = buffer[i]; 
 
   // [4CH,436] the SECTs of first 109 FAT sectors
-  for( unsigned i=0; i<109; i++ )
+  for( unsigned int i=0; i<109; i++ )
     bb_blocks[i] = readU32( buffer + 0x4C+i*4 );
   dirty = false;
 }
@@ -396,7 +400,7 @@ void Header::save( unsigned char* buffer )
   writeU32( buffer + 0x44, (uint32) mbat_start );
   writeU32( buffer + 0x48, (uint32) num_mbat );
   
-  for( unsigned i=0; i<109; i++ )
+  for( unsigned int i=0; i<109; i++ )
     writeU32( buffer + 0x4C+i*4, (uint32) bb_blocks[i] );
   dirty = false;
 }
@@ -429,8 +433,11 @@ const uint64 AllocTable::Bat = 0xfffffffd;
 const uint64 AllocTable::MetaBat = 0xfffffffc;
 
 AllocTable::AllocTable()
+:   blockSize(4096),
+    data(),
+    dirtyBlocks(),
+    bMaybeFragmented(true)
 {
-  blockSize = 4096;
   // initial size
   resize( 128 );
 }
@@ -631,6 +638,8 @@ int DirEntry::compare(const std::string& name2)
 const uint64 DirTree::End = 0xffffffff;
 
 DirTree::DirTree(int64 bigBlockSize)
+:   entries(),
+    dirtyBlocks()
 {
   clear(bigBlockSize);
 }
@@ -783,7 +792,7 @@ DirEntry* DirTree::entry( const std::string& name, bool create, int64 bigBlockSi
        if( !create || !io->writeable) return (DirEntry*)0;
        
        // create a new entry
-       uint64 parent = index;
+       uint64 parent2 = index;
        index = unused();
        DirEntry* e = entry( index );
        e->valid = true;
@@ -798,9 +807,9 @@ DirEntry* DirTree::entry( const std::string& name, bool create, int64 bigBlockSi
        if (closest == End)
        {
            e->prev = End;
-           e->next = entry(parent)->child;
-           entry(parent)->child = index;
-           markAsDirty(parent, bigBlockSize);
+           e->next = entry(parent2)->child;
+           entry(parent2)->child = index;
+           markAsDirty(parent2, bigBlockSize);
        }
        else
        {
@@ -1082,11 +1091,11 @@ void DirTree::findParentAndSib(uint64 inIdx, const std::string& inFullName, uint
     if (lastSlash == 0)
         lastSlash = 1; //leave root
     parentName = parentName.substr(0, lastSlash);
-    DirEntry *parent = entry(parentName);
-    parentIdx = indexOf(parent);
-    if (parent->child == inIdx)
+    DirEntry *parent2 = entry(parentName);
+    parentIdx = indexOf(parent2);
+    if (parent2->child == inIdx)
         return; //successful return, no sibling points to inIdx
-    sibIdx = findSib(inIdx, parent->child);
+    sibIdx = findSib(inIdx, parent2->child);
 }
 
 // Utility function to get the index of the sibling dirEntry which points to inIdx. It is the responsibility of the original caller
@@ -1196,21 +1205,25 @@ void DirTree::debug()
 // =========== StorageIO ==========
 
 StorageIO::StorageIO( Storage* st, const char* fname )
+: storage(st),        
+  filename(fname),
+  file(), 
+  result(Storage::Ok),        
+  opened(false),        
+  filesize(0),        
+  writeable(false),        
+  header(new Header()),        
+  dirtree(new DirTree(1 << header->b_shift)),        
+  bbat(new AllocTable()),        
+  sbat(new AllocTable()),
+  sb_blocks(),
+  mbat_blocks(),
+  mbat_data(),
+  mbatDirty(),
+  streams()
 {
-  storage = st;
-  filename = fname;
-  result = Storage::Ok;
-  opened = false;
-  
-  header = new Header();
-  bbat = new AllocTable();
-  sbat = new AllocTable();
-  
-  filesize = 0;
   bbat->blockSize = (uint64) 1 << header->b_shift;
   sbat->blockSize = (uint64) 1 << header->s_shift;
-  dirtree = new DirTree(bbat->blockSize);
-  writeable = false;
 }
 
 StorageIO::~StorageIO()
@@ -1459,10 +1472,10 @@ StreamIO* StorageIO::streamIO( const std::string& name, bool bCreate, int64 stre
   //if( !entry->dir ) std::cout << "  NOT DIR\n";
   if( entry->dir ) return (StreamIO*)0;
 
-  StreamIO* result = new StreamIO( this, entry );
-  result->fullName = name;
+  StreamIO* result2 = new StreamIO( this, entry );
+  result2->fullName = name;
   
-  return result;
+  return result2;
 }
 
 bool StorageIO::deleteByName(const std::string& fullName)
@@ -1851,23 +1864,21 @@ void StorageIO::addbbatBlock()
 // =========== StreamIO ==========
 
 StreamIO::StreamIO( StorageIO* s, DirEntry* e)
+:   io(s),
+    entryIdx(io->dirtree->indexOf(e)),
+    fullName(),
+    blocks(),
+    eof(false),
+    fail(false),
+    m_pos(0),
+    cache_data(new unsigned char[CACHEBUFSIZE]),        
+    cache_size(0),         // indicating an empty cache
+    cache_pos(0)
 {
-  io = s;
-  entryIdx = io->dirtree->indexOf(e);
-  eof = false;
-  fail = false;
-  
-  m_pos = 0;
-
   if( e->size >= io->header->threshold ) 
     blocks = io->bbat->follow( e->start );
   else
     blocks = io->sbat->follow( e->start );
-
-  // prepare cache
-  cache_pos = 0;
-  cache_size = 0; // indicating an empty cache
-  cache_data = new unsigned char[CACHEBUFSIZE];
 }
 
 // FIXME tell parent we're gone
@@ -2083,10 +2094,14 @@ uint64 StreamIO::write( uint64 pos, unsigned char* data, uint64 len )
             std::vector<uint64> sbat_blocks = io->bbat->follow(io->header->sbat_start);
             io->ExtendFile(&sbat_blocks);
             io->header->num_sbat++;
+            io->header->dirty = true; //Header will have to be rewritten
         }
         uint64 sidx = nblock * io->sbat->blockSize / io->bbat->blockSize;
-        while (sidx >= io->sb_blocks.size())
+        while (sidx >= io->sb_blocks.size()) 
+        {
             io->ExtendFile(&io->sb_blocks);
+            io->dirtree->markAsDirty(0, io->bbat->blockSize); //make sure to rewrite first directory block
+        }
     }
     uint64 offset = pos % io->sbat->blockSize;
     index = pos / io->sbat->blockSize;
@@ -2170,18 +2185,18 @@ void Storage::close()
 
 std::list<std::string> Storage::entries( const std::string& path )
 {
-  std::list<std::string> result;
+  std::list<std::string> localResult;
   DirTree* dt = io->dirtree;
   DirEntry* e = dt->entry( path, false );
   if( e  && e->dir )
   {
     uint64 parent = dt->indexOf( e );
     std::vector<uint64> children = dt->children( parent );
-    for( unsigned i = 0; i < children.size(); i++ )
-      result.push_back( dt->entry( children[i] )->name );
+    for( uint64 i = 0; i < children.size(); i++ )
+      localResult.push_back( dt->entry( children[i] )->name );
   }
   
-  return result;
+  return localResult;
 }
 
 bool Storage::isDirectory( const std::string& name )
@@ -2251,8 +2266,8 @@ std::list<std::string> Storage::GetAllStreams( const std::string& storageName )
 // =========== Stream ==========
 
 Stream::Stream( Storage* storage, const std::string& name, bool bCreate, int64 streamSize )
+:   io(storage->io->streamIO( name, bCreate, (int) streamSize ))
 {
-  io = storage->io->streamIO( name, bCreate, (int) streamSize );
 }
 
 // FIXME tell parent we're gone
