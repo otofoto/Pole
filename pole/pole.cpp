@@ -55,6 +55,10 @@
 
 #include "pole.h"
 
+#ifdef POLE_USE_UTF16_FILENAMES
+#include <codecvt>
+#endif //POLE_USE_UTF16_FILENAMES
+
 // enable to activate debugging output
 // #define POLE_DEBUG
 #define CACHEBUFSIZE 4096 //a presumably reasonable size for the read cache
@@ -284,6 +288,20 @@ class StreamIO
 }; // namespace POLE
 
 using namespace POLE;
+
+#ifdef POLE_USE_UTF16_FILENAMES
+
+std::string POLE::UTF16toUTF8(const std::wstring &utf16) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
+    return converter.to_bytes(utf16);
+}
+
+std::wstring POLE::UTF8toUTF16(const std::string &utf8) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
+    return converter.from_bytes(utf8);
+}
+
+#endif //POLE_USE_UTF16_FILENAMES
 
 static void fileCheck(std::fstream &file)
 {
@@ -1264,10 +1282,18 @@ void StorageIO::load(bool bWriteAccess)
   // open the file, check for error
   result = Storage::OpenFailed;
 
+#if defined(POLE_USE_UTF16_FILENAMES)
   if (bWriteAccess)
-      file.open( filename.c_str(), std::ios::binary | std::ios::in | std::ios::out );
+      file.open(UTF8toUTF16(filename).c_str(), std::ios::binary | std::ios::in | std::ios::out);
   else
-      file.open( filename.c_str(), std::ios::binary | std::ios::in );
+      file.open(UTF8toUTF16(filename).c_str(), std::ios::binary | std::ios::in);
+#else
+  if (bWriteAccess)
+      file.open(filename.c_str(), std::ios::binary | std::ios::in | std::ios::out);
+  else
+      file.open(filename.c_str(), std::ios::binary | std::ios::in);
+#endif //defined(POLE_USE_UTF16_FILENAMES) && defined(POLE_WIN)
+
   if( !file.good() ) return;
   
   // find size of input file
@@ -1347,11 +1373,14 @@ void StorageIO::load(bool bWriteAccess)
   opened = true;
 }
 
-void StorageIO::create()
-{
+void StorageIO::create() {
   // std::cout << "Creating " << filename << std::endl; 
   
+#if defined(POLE_USE_UTF16_FILENAMES)
+  file.open(UTF8toUTF16(filename).c_str(), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
+#else
   file.open( filename.c_str(), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
+#endif
   if( !file.good() )
   {
     std::cerr << "Can't create " << filename << std::endl;

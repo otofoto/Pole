@@ -1,8 +1,8 @@
 /* POLE - Portable C++ library to access OLE Storage 
    Copyright (C) 2002-2005 Ariya Hidayat <ariya@kde.org>
 
-   Performance optimization: Dmitry Fedorov 
-   Copyright 2009 <www.bioimage.ucsb.edu> <www.dimin.net> 
+   Performance optimization, API improvements: Dmitry Fedorov 
+   Copyright 2009-2014 <www.bioimage.ucsb.edu> <www.dimin.net> 
 
    Fix for more than 236 mbat block entries : Michel Boudinot
    Copyright 2010 <Michel.Boudinot@inaf.cnrs-gif.fr>
@@ -16,7 +16,7 @@
    More datatype changes to allow for 32 and 64 bit code, some fixes involving incremental updates, flushing
    Copyright 2013 <srbaum@gmail.com>
    
-   Version: 0.5.2
+   Version: 0.5.3
 
    Redistribution and use in source and binary forms, with or without 
    modification, are permitted provided that the following conditions 
@@ -43,6 +43,18 @@
    THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*
+Unicode notes:
+
+Filenames are considered to be encoded in UTF-8 encoding. On windows they 
+can be re-encoded into UTF16 and proper wchar_t APIs will be used to open files.
+This is a default behavior for windows and is defined by the macro POLE_USE_UTF16_FILENAMES.
+
+Using a provided function and a modern c++ compiler it's easy to encode a 
+wide string into utf8 char*:
+    std::string POLE::UTF16toUTF8(const std::wstring &utf16);
+*/
+
 #ifndef POLE_H
 #define POLE_H
 
@@ -54,6 +66,8 @@ namespace POLE
 {
 
 #if defined WIN32 || defined WIN64 || defined _WIN32 || defined _WIN64 || defined _MSVC
+#define POLE_USE_UTF16_FILENAMES
+#define POLE_WIN
 typedef __int32 int32;
 typedef __int64 int64;
 typedef unsigned __int32 uint32;
@@ -66,6 +80,11 @@ typedef unsigned long long uint64;
 #endif
 
 typedef uint64 t_offset;
+
+#ifdef POLE_USE_UTF16_FILENAMES
+std::string UTF16toUTF8(const std::wstring &utf16);
+std::wstring UTF8toUTF16(const std::string &utf8);
+#endif //POLE_USE_UTF16_FILENAMES
 
 class StorageIO;
 class Stream;
