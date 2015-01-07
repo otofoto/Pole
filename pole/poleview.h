@@ -20,8 +20,22 @@
 #ifndef POLEVIEW
 #define POLEVIEW
 
-#include <QtCore>
-#include <QtGui>
+#include <QApplication>
+#include <QMainWindow>
+#include <QMenu>
+#include <QTreeWidget>
+#include <QDialog>
+#include <QLabel>
+#include <QTextEdit>
+#include <QTreeWidget>
+#include <QAction>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QTime>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QTimer>
+#include <QVBoxLayout>
 
 #include "pole.h"
 
