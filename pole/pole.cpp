@@ -285,7 +285,7 @@ class StreamIO
     void updateCache();
 };
 
-}; // namespace POLE
+} // namespace POLE
 
 using namespace POLE;
 
@@ -1231,7 +1231,7 @@ StorageIO::StorageIO( Storage* st, const char* fname )
   filesize(0),        
   writeable(false),        
   header(new Header()),        
-  dirtree(new DirTree(1 << header->b_shift)),        
+    dirtree(new DirTree( (uint64_t) 1 << header->b_shift)),
   bbat(new AllocTable()),        
   sbat(new AllocTable()),
   sb_blocks(),
@@ -1974,7 +1974,7 @@ void StreamIO::setSize(uint64 newSize)
         if (len)
         {
             write(0, buffer, len);
-            delete buffer;
+            delete [] buffer;
         }
         if (savePos <= entry->size)
             seek(savePos);
