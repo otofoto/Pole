@@ -12,6 +12,8 @@ This library is initially developed by Ariya Hidayat <ariya@kde.org>. Since curr
 Download
 Use Github repository for contributing to the project, accessing the source code online, filing bug reports and checking what's new.
 
+![poleview](https://github.com/user-attachments/assets/80e86427-b54f-4868-9df4-70000006b22d)
+
 **How to use**
 To compile POLE, you need a C++ compiler, with standard C++ library which supports STL (Standard Template Library).
 
